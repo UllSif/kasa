@@ -7,25 +7,30 @@ export function useFetch(url) {
 
     useEffect(() => {
         if (!url) {
-            return
+            setLoading(false);
+            return;
         }
 
         setLoading(true);
 
         async function fetchData() {
             try {
-                let response = await fetch(url)
-                let data = await response.json()
-                setFetchData(data)
+                let response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                let data = await response.json();
+                setFetchData(data);
             } catch (err) {
-                console.log(err)
-                setError(true)
+                console.error('Fetch error:', err);
+                setError(err);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
 
-        fetchData()
-    }, [url])
-    return {fetchedData, error};
+        fetchData();
+    }, [url]);
+
+    return { fetchedData, isLoading, error };
 }
